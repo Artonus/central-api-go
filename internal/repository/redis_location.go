@@ -8,6 +8,8 @@ import (
 )
 
 type locationDto struct {
+	Key          string `json:"key" redis:",key"`
+	Ver          int64  `json:"ver" redis:",ver"`
 	Id           string
 	LocationType string
 	Name         string
