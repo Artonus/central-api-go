@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  central-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.debug
+    container_name: central-api-dev
+    ports:
+      - "8080:8080"
+      - "40000:40000"
+    environment:
+      REDIS_HOSTNAME: ${REDIS_HOSTNAME}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    security_opt:
+      - "seccomp:unconfined"
+    cap_add:
+      - SYS_PTRACE

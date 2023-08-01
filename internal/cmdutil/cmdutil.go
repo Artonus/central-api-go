@@ -1,6 +1,7 @@
 package cmdutil
 
 import (
+	"errors"
 	"github.com/redis/rueidis"
 	"go.uber.org/zap"
 	"os"
@@ -24,6 +25,10 @@ func CreateRedisConnection() rueidis.Client {
 	//TODO: add env variables or secret manager to create connection string
 	pass := os.Getenv("REDIS_PASSWORD")
 	hostname := os.Getenv("REDIS_HOSTNAME")
+
+	if pass == "" || hostname == "" {
+		panic(errors.New("Redis hostname or password not specified"))
+	}
 	c, err := rueidis.NewClient(rueidis.ClientOption{
 		InitAddress: []string{hostname},
 		Username:    "",

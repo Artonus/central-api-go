@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/Artonus/central-api-go/internal/domain"
-	"github.com/gorilla/mux"
 	"net/http"
 )
 
@@ -16,10 +15,9 @@ type locationsResponse struct {
 func (api *api) getAvailableLocations(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithCancel(r.Context())
 	defer cancel()
-	vars := mux.Vars(r)
 
-	organization, exists := vars["organization"]
-	if !exists {
+	organization := r.URL.Query().Get("organization")
+	if organization == "" {
 		api.errorResponse(w, r, http.StatusBadRequest, errors.New("organization parameter was not specified"))
 		return
 	}
