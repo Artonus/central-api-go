@@ -22,3 +22,6 @@ main
 
 # Go workspace file
 go.work
+
+redis/
+memgraph/
