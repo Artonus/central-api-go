@@ -1,8 +1,9 @@
 package cmdutil
 
 import (
-	"errors"
-	"github.com/redis/rueidis"
+	"context"
+	"fmt"
+	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"go.uber.org/zap"
 	"os"
 )
@@ -21,21 +22,20 @@ func CreateLogger(serviceName string) *zap.Logger {
 	return logger
 }
 
-func CreateRedisConnection() rueidis.Client {
-	//TODO: add env variables or secret manager to create connection string
-	pass := os.Getenv("REDIS_PASSWORD")
-	hostname := os.Getenv("REDIS_HOSTNAME")
+func CreateGraphConnection() neo4j.DriverWithContext {
 
-	if pass == "" || hostname == "" {
-		panic(errors.New("Redis hostname or password not specified"))
-	}
-	c, err := rueidis.NewClient(rueidis.ClientOption{
-		InitAddress: []string{hostname},
-		Username:    "",
-		Password:    pass,
-	})
+	address := os.Getenv("GRAPH_ADDRESS")
+	username := os.Getenv("GRAPH_USERNAME")
+	pass := os.Getenv("GRAPH_PASSWORD")
+	driver, err := neo4j.NewDriverWithContext(address, neo4j.BasicAuth(username, pass, ""))
+
+	ctx := context.Background()
+	err = driver.VerifyConnectivity(ctx)
 	if err != nil {
 		panic(err)
+	} else {
+		fmt.Println("Viola! Connected to Memgraph!")
 	}
-	return c
+
+	return driver
 }

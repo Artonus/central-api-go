@@ -37,9 +37,11 @@ func apiCmd(ctx context.Context) *cobra.Command {
 			logger := cmdutil.CreateLogger("Api")
 			defer func() { _ = logger.Sync() }()
 
-			redis := cmdutil.CreateRedisConnection()
+			graph := cmdutil.CreateGraphConnection()
+			ctx := context.Background()
+			defer graph.Close(ctx)
 
-			api := api.CreateApi(ctx, logger, redis)
+			api := api.CreateApi(ctx, logger, graph)
 			srv := api.Server(port)
 
 			go func() { _ = srv.ListenAndServe() }()

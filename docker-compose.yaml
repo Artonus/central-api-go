@@ -11,7 +11,45 @@ services:
     environment:
       REDIS_HOSTNAME: ${REDIS_HOSTNAME}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
+      GRAPH_ADDRESS: ${GRAPH_ADDRESS}
     security_opt:
       - "seccomp:unconfined"
     cap_add:
       - SYS_PTRACE
+  memgraph-ui:
+    image: memgraph/memgraph-platform:latest
+    container_name: memgraph-ui
+    ports:
+      - "7687:7687"
+      - "3000:3000"
+      - "7444:7444"
+    volumes:
+      - mg_lib:/var/lib/memgraph
+      - mg_log:/var/log/memgraph
+      - mg_etc:/etc/memgraph
+    env_file:
+      - /.env
+    entrypoint: [ "/usr/bin/supervisord" ]
+  postgres:
+    image: postgres:latest
+    container_name: postgres-dev
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+  redis:
+    image: redis:latest
+    container_name: redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis:/data
+volumes:
+  mg_log:
+  mg_lib:
+  mg_etc:
+

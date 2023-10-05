@@ -15,6 +15,7 @@ type locationDto struct {
 	Name         string
 	Organization string
 	Address      string
+	ApiKey       string
 }
 
 func (d *locationDto) ToLocation() domain.Location {
