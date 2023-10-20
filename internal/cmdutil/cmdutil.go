@@ -3,8 +3,10 @@ package cmdutil
 import (
 	"context"
 	"fmt"
+	"github.com/jmoiron/sqlx"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"go.uber.org/zap"
+	"log"
 	"os"
 )
 
@@ -21,7 +23,21 @@ func CreateLogger(serviceName string) *zap.Logger {
 
 	return logger
 }
+func CreateDbConnection() *sqlx.DB {
 
+	host := os.Getenv("GRAPH_ADDRESS")
+	username := os.Getenv("GRAPH_USERNAME")
+	pass := os.Getenv("GRAPH_PASSWORD")
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		host, 5432, username, pass, "central-api")
+
+	db, err := sqlx.Connect("postgres", psqlInfo)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return db
+}
 func CreateGraphConnection() neo4j.DriverWithContext {
 
 	address := os.Getenv("GRAPH_ADDRESS")
@@ -35,6 +51,20 @@ func CreateGraphConnection() neo4j.DriverWithContext {
 		panic(err)
 	} else {
 		fmt.Println("Viola! Connected to Memgraph!")
+	}
+	session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: ""})
+
+	defer session.Close(ctx)
+	// Run index queries via implicit auto-commit transaction
+	indexes := []string{
+		"create index on :Location(id)",
+		"create index on :Location(name)",
+	}
+	for _, index := range indexes {
+		_, err = session.Run(ctx, index, nil)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	return driver

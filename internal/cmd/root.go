@@ -41,7 +41,9 @@ func apiCmd(ctx context.Context) *cobra.Command {
 			ctx := context.Background()
 			defer graph.Close(ctx)
 
-			api := api.CreateApi(ctx, logger, graph)
+			db := cmdutil.CreateDbConnection()
+
+			api := api.CreateApi(ctx, logger, graph, db)
 			srv := api.Server(port)
 
 			go func() { _ = srv.ListenAndServe() }()
