@@ -12,6 +12,7 @@ type Location struct {
 	Name         string
 	Organization string
 	Address      string
+	ApiKey       string `db:"api_key"`
 }
 
 type LocationRepository interface {

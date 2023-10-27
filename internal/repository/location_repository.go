@@ -19,6 +19,10 @@ func NewLocationRepository(db *sqlx.DB) domain.LocationRepository {
 func (r *locationRepository) GetAvailableLocations(ctx context.Context, organization string) (*[]domain.Location, error) {
 	var locations []domain.Location
 
-	r.DB.Select(&locations, "select id, ")
+	err := r.DB.Select(&locations, "select id, name, organization, address, api_key from locations where organization=$1;", organization)
+
+	if err != nil {
+		return nil, err
+	}
 	return &locations, nil
 }

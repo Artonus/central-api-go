@@ -2,8 +2,10 @@ package cmdutil
 
 import (
 	"context"
+	_ "database/sql"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"go.uber.org/zap"
 	"log"
@@ -25,9 +27,9 @@ func CreateLogger(serviceName string) *zap.Logger {
 }
 func CreateDbConnection() *sqlx.DB {
 
-	host := os.Getenv("GRAPH_ADDRESS")
-	username := os.Getenv("GRAPH_USERNAME")
-	pass := os.Getenv("GRAPH_PASSWORD")
+	host := os.Getenv("POSTGRES_HOST")
+	username := os.Getenv("POSTGRES_USER")
+	pass := os.Getenv("POSTGRES_PASSWORD")
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, 5432, username, pass, "central-api")
