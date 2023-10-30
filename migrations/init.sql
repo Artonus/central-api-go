@@ -14,3 +14,5 @@ create table robots(
     name varchar(32) not null,
     api_key varchar(100)
 );
+
+alter table locations add column is_online boolean default false;

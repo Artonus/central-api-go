@@ -43,6 +43,9 @@ func (api *api) Routes() *mux.Router {
 
 	r.HandleFunc("/api/v1/locations", api.getAvailableLocations).Methods("GET")
 	r.HandleFunc("/api/v1/locations/register", api.registerNewLocation).Methods("POST")
+	r.HandleFunc("/api/v1/heartbeat/:id/online", api.setLocationOnline).Methods("POST")
+	r.HandleFunc("/api/v1/heartbeat/:id/online", api.setLocationOffline).Methods("POST")
+	r.HandleFunc("/api/v1/heartbeat", api.sendHeartbeat).Methods("POST")
 	r.HandleFunc("/api/v1/test", api.testGraphConnection).Methods("GET")
 
 	return r
