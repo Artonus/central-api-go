@@ -46,11 +46,11 @@ func (api *api) Routes() *mux.Router {
 
 	r.HandleFunc("/api/v1/location", api.getAvailableLocations).Methods("GET")
 	r.HandleFunc("/api/v1/location/register", api.registerNewLocation).Methods("POST")
-	r.HandleFunc("/api/v1/location/heartbeat/:id/online", api.setLocationOnline).Methods("POST")
-	r.HandleFunc("/api/v1/location/heartbeat/:id/online", api.setLocationOffline).Methods("POST")
+	r.HandleFunc("/api/v1/location/heartbeat/{id}/online", api.setLocationOnline).Methods("POST")
+	r.HandleFunc("/api/v1/location/heartbeat/{id}/offline", api.setLocationOffline).Methods("POST")
 	r.HandleFunc("/api/v1/location/heartbeat", api.sendHeartbeat).Methods("POST")
 	r.HandleFunc("/api/v1/robot", api.addRobot).Methods("POST")
-	r.HandleFunc("/api/v1/robot/:id", api.getRobotById).Methods("GET")
+	r.HandleFunc("/api/v1/robot/{id}", api.getRobotById).Methods("GET")
 	r.HandleFunc("/api/v1/test", api.testGraphConnection).Methods("GET")
 
 	return r

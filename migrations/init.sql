@@ -16,3 +16,4 @@ create table robots(
 );
 CREATE UNIQUE INDEX CONCURRENTLY robots_name_unique_idx ON robots (name);
 alter table locations add column is_online boolean default false;
+alter table locations add column last_seen_online timestamp null;

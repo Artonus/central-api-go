@@ -4,6 +4,7 @@ import (
 	"github.com/Artonus/central-api-go/internal/domain"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"time"
 )
 
 type locationRepository struct {
@@ -30,7 +31,8 @@ func (r *locationRepository) RegisterLocation(location *domain.Location) error {
 }
 
 func (r *locationRepository) SetLocationOnline(id uuid.UUID) error {
-	_, err := r.DB.Exec("update locations set is_online=false where id=$1", id)
+	now := time.Now()
+	_, err := r.DB.Exec("update locations set is_online=true, last_seen_online=$2 where id=$1", id, now)
 	if err != nil {
 		return err
 	}
@@ -48,7 +50,7 @@ func (r *locationRepository) SetLocationOffline(id uuid.UUID) error {
 func (r *locationRepository) GetAvailableLocations(organization string) (*[]domain.Location, error) {
 	var locations []domain.Location
 
-	err := r.DB.Select(&locations, "select id, name, organization, address, api_key from locations where organization=$1 and is_online=$2;", organization, true)
+	err := r.DB.Select(&locations, "select id, name, organization, address, api_key, is_online, last_seen_online from locations where organization=$1 and is_online=$2;", organization, true)
 
 	if err != nil {
 		return nil, err
