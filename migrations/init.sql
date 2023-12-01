@@ -14,5 +14,5 @@ create table robots(
     name varchar(32) not null,
     api_key varchar(100)
 );
-
+CREATE UNIQUE INDEX CONCURRENTLY robots_name_unique_idx ON robots (name);
 alter table locations add column is_online boolean default false;

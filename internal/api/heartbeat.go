@@ -22,20 +22,20 @@ func (api *api) sendHeartbeat(w http.ResponseWriter, r *http.Request) {
 	var heartbeat HeartbeatRequest
 	err := decoder.Decode(&heartbeat)
 	if err != nil {
-		api.errorResponse(w, r, http.StatusBadRequest, err)
+		api.sendErrorResponse(w, r, http.StatusBadRequest, err)
 		return
 	}
 	exists, err := api.locationRepository.CheckIfLocationExists(heartbeat.Id)
 	if err != nil {
-		api.errorResponse(w, r, http.StatusBadRequest, err)
+		api.sendErrorResponse(w, r, http.StatusBadRequest, err)
 	}
 	if exists == false {
-		api.errorResponse(w, r, http.StatusNotFound, errors.New("specified location does not exist"))
+		api.sendErrorResponse(w, r, http.StatusNotFound, errors.New("specified location does not exist"))
 	}
 
 	err = api.locationRepository.SetLocationOnline(heartbeat.Id)
 	if err != nil {
-		api.errorResponse(w, r, http.StatusInternalServerError, err)
+		api.sendErrorResponse(w, r, http.StatusInternalServerError, err)
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
@@ -44,19 +44,19 @@ func (api *api) sendHeartbeat(w http.ResponseWriter, r *http.Request) {
 func (api *api) setLocationOnline(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
-	idString := vars["idString"]
+	idString := vars["id"]
 	if idString == "" {
-		api.errorResponse(w, r, http.StatusBadRequest, errors.New("no idString parameter was provided"))
+		api.sendErrorResponse(w, r, http.StatusBadRequest, errors.New("no idString parameter was provided"))
 		return
 	}
 	id, err := uuid.Parse(idString)
 	if err != nil {
-		api.errorResponse(w, r, http.StatusBadRequest, err)
+		api.sendErrorResponse(w, r, http.StatusBadRequest, err)
 		return
 	}
 	err = api.locationRepository.SetLocationOnline(id)
 	if err != nil {
-		api.errorResponse(w, r, http.StatusBadRequest, err)
+		api.sendErrorResponse(w, r, http.StatusBadRequest, err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -65,19 +65,19 @@ func (api *api) setLocationOnline(w http.ResponseWriter, r *http.Request) {
 
 func (api *api) setLocationOffline(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	idString := vars["idString"]
+	idString := vars["id"]
 	if idString == "" {
-		api.errorResponse(w, r, http.StatusBadRequest, errors.New("no idString parameter was provided"))
+		api.sendErrorResponse(w, r, http.StatusBadRequest, errors.New("no idString parameter was provided"))
 		return
 	}
 	id, err := uuid.Parse(idString)
 	if err != nil {
-		api.errorResponse(w, r, http.StatusBadRequest, err)
+		api.sendErrorResponse(w, r, http.StatusBadRequest, err)
 		return
 	}
 	err = api.locationRepository.SetLocationOffline(id)
 	if err != nil {
-		api.errorResponse(w, r, http.StatusBadRequest, err)
+		api.sendErrorResponse(w, r, http.StatusBadRequest, err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

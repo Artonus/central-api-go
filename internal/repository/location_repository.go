@@ -48,7 +48,7 @@ func (r *locationRepository) SetLocationOffline(id uuid.UUID) error {
 func (r *locationRepository) GetAvailableLocations(organization string) (*[]domain.Location, error) {
 	var locations []domain.Location
 
-	err := r.DB.Select(&locations, "select id, name, organization, address, api_key from locations where organization=$1;", organization)
+	err := r.DB.Select(&locations, "select id, name, organization, address, api_key from locations where organization=$1 and is_online=$2;", organization, true)
 
 	if err != nil {
 		return nil, err

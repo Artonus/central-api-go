@@ -17,6 +17,7 @@ type api struct {
 	httpClient *http.Client
 
 	locationRepository domain.LocationRepository
+	robotRepository    domain.RobotRepository
 	graphDriver        neo4j.DriverWithContext
 }
 
@@ -24,10 +25,12 @@ func CreateApi(ctx context.Context, logger *zap.Logger, graph neo4j.DriverWithCo
 
 	client := &http.Client{}
 	locationRepository := repository.NewLocationRepository(db)
+	robotRepository := repository.NewRobotRepository(db)
 	return &api{
 		logger:             logger,
 		httpClient:         client,
 		locationRepository: locationRepository,
+		robotRepository:    robotRepository,
 		graphDriver:        graph,
 	}
 }
@@ -41,11 +44,13 @@ func (api *api) Server(port int) *http.Server {
 func (api *api) Routes() *mux.Router {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/api/v1/locations", api.getAvailableLocations).Methods("GET")
-	r.HandleFunc("/api/v1/locations/register", api.registerNewLocation).Methods("POST")
-	r.HandleFunc("/api/v1/heartbeat/:id/online", api.setLocationOnline).Methods("POST")
-	r.HandleFunc("/api/v1/heartbeat/:id/online", api.setLocationOffline).Methods("POST")
-	r.HandleFunc("/api/v1/heartbeat", api.sendHeartbeat).Methods("POST")
+	r.HandleFunc("/api/v1/location", api.getAvailableLocations).Methods("GET")
+	r.HandleFunc("/api/v1/location/register", api.registerNewLocation).Methods("POST")
+	r.HandleFunc("/api/v1/location/heartbeat/:id/online", api.setLocationOnline).Methods("POST")
+	r.HandleFunc("/api/v1/location/heartbeat/:id/online", api.setLocationOffline).Methods("POST")
+	r.HandleFunc("/api/v1/location/heartbeat", api.sendHeartbeat).Methods("POST")
+	r.HandleFunc("/api/v1/robot", api.addRobot).Methods("POST")
+	r.HandleFunc("/api/v1/robot/:id", api.getRobotById).Methods("GET")
 	r.HandleFunc("/api/v1/test", api.testGraphConnection).Methods("GET")
 
 	return r

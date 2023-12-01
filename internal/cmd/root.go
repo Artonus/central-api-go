@@ -5,6 +5,7 @@ import (
 	"github.com/Artonus/central-api-go/internal/api"
 	"github.com/Artonus/central-api-go/internal/cmdutil"
 	"github.com/joho/godotenv"
+	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 	"net/http"
@@ -39,12 +40,17 @@ func apiCmd(ctx context.Context) *cobra.Command {
 
 			graph := cmdutil.CreateGraphConnection()
 			ctx := context.Background()
-			defer graph.Close(ctx)
+			defer func(graph neo4j.DriverWithContext, ctx context.Context) {
+				err := graph.Close(ctx)
+				if err != nil {
+					logger.Error("There was an error while closing Graph connection: {1}", zap.String("error", err.Error()))
+				}
+			}(graph, ctx)
 
 			db := cmdutil.CreateDbConnection()
 
-			api := api.CreateApi(ctx, logger, graph, db)
-			srv := api.Server(port)
+			centralApi := api.CreateApi(ctx, logger, graph, db)
+			srv := centralApi.Server(port)
 
 			go func() { _ = srv.ListenAndServe() }()
 
